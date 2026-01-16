@@ -40,7 +40,4 @@ int main() try {
 } catch (const std::exception& e) {
     std::println("Exception: {}", e.what());
     return 1;
-} catch (...) {
-    std::println("Unknown exception");
-    return 1;
 }
