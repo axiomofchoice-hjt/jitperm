@@ -4,8 +4,8 @@
 #include <print>
 #include <vector>
 
-#include "assert.h"
-#include "interface.h"
+#include "base/assert.h"
+#include "kernel/kernel_api.h"
 
 int main() try {
     std::vector<int32_t> in = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
@@ -18,7 +18,7 @@ int main() try {
     }
     {
         std::vector<int32_t> out(permutation.size(), -1);
-        auto fn = gen_kernel<int32_t, ISA::SSEStore>(permutation);
+        auto fn = gen_kernel<int32_t, ISA::SSEPack>(permutation);
         fn.get()(in.data(), out.data());
         std::println("{}", out);
     }

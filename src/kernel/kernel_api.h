@@ -1,8 +1,8 @@
 #pragma once
 
-#include "jit.h"
+#include "base/jit.h"
 
-enum class ISA { Unknown, Scalar, SSEStore };
+enum class ISA { Unknown, Scalar, SSEPack };
 
 template <typename T>
 using kernel_fn = void (*)(const T* input, T* output);

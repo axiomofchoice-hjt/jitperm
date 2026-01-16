@@ -1,7 +1,7 @@
 #include <algorithm>
 #include <ranges>
 
-#include "interface.h"
+#include "kernel_api.h"
 
 template <>
 jit_fn<int32_t> gen_kernel<int32_t, ISA::Scalar>(std::span<const size_t> permutation) {
