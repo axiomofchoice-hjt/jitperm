@@ -1,0 +1,23 @@
+#pragma once
+
+#include <algorithm>
+
+#include "jit.h"
+#include "kernel_fn.h"
+
+inline jit::unique_function<kernel_fn<int32_t>> gen_kernel_scalar(
+    std::span<const size_t> permutation) {
+    size_t source_size = *std::ranges::max_element(permutation) + 1;
+    size_t target_size = permutation.size();
+    return jit::gen<kernel_fn<int32_t>>([=](asmjit::x86::Assembler& as) {
+        namespace x86 = asmjit::x86;
+
+        for (size_t i = 0; i < target_size; ++i) {
+            as.mov(x86::eax,
+                   x86::dword_ptr(x86::rdi, permutation[i] * sizeof(int32_t)));
+            as.mov(x86::dword_ptr(x86::rsi, i * sizeof(int32_t)), x86::eax);
+        }
+
+        as.ret();
+    });
+}
