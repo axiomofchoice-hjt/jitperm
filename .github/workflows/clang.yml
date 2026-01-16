@@ -29,7 +29,7 @@ jobs:
 
       - name: Generate compile_commands.json
         run: |
-          xmake -y project -k compile_commands build
+          xmake project -k compile_commands build -y
 
       - name: Run clang-format (check only)
         run: |
