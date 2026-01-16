@@ -1,7 +1,6 @@
 name: clang checks
 
 on:
-  push:
   pull_request:
 
 jobs:
@@ -29,7 +28,7 @@ jobs:
 
       - name: Generate compile_commands.json
         run: |
-          xmake project -k compile_commands build -y
+          xmake project -y -k compile_commands build
 
       - name: Run clang-format (check only)
         run: |
