@@ -2,7 +2,7 @@
 
 #include "base/jit.h"
 
-enum class ISA { Unknown, Scalar, SSEPack };
+enum class ISA : uint8_t { Unknown, Scalar, SSEPack };
 
 template <typename T>
 using kernel_fn = void (*)(const T* input, T* output);
