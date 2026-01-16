@@ -1,0 +1,14 @@
+#pragma once
+
+#include "jit.h"
+
+enum class ISA { Unknown, Scalar, SSE };
+
+template <typename T>
+using kernel_fn = void (*)(const T* input, T* output);
+
+template <typename T>
+using jit_fn = jit::unique_function<kernel_fn<T>>;
+
+template <typename T, ISA isa>
+jit_fn<T> gen_kernel(std::span<const size_t> permutation);

@@ -1,11 +1,9 @@
-#pragma once
-
 #include <algorithm>
 
-#include "jit.h"
-#include "kernel_fn.h"
+#include "interface.h"
 
-inline jit::unique_function<kernel_fn<int32_t>> gen_kernel_scalar(
+template <>
+jit_fn<int32_t> gen_kernel<int32_t, ISA::Scalar>(
     std::span<const size_t> permutation) {
     size_t source_size = *std::ranges::max_element(permutation) + 1;
     size_t target_size = permutation.size();

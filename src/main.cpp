@@ -2,19 +2,26 @@
 
 #include <cstdint>
 #include <print>
+#include <vector>
 
 #include "assert.h"
-#include "kernel_s32_scalar.h"
+#include "interface.h"
 
 int main() try {
-    auto fn = gen_kernel_scalar(std::array<size_t, 4>{3, 0, 1, 2});
-
-    int32_t in[4] = {0, 1, 2, 3};
-    int32_t out[4] = {};
-
-    fn.get()(in, out);
-
-    std::println("{}", out);
+    std::vector<int32_t> in = {0, 1, 2, 3};
+    std::vector<size_t> permutation = {3, 0, 1, 2};
+    {
+        std::vector<int32_t> out(4, -1);
+        auto fn = gen_kernel<int32_t, ISA::Scalar>(permutation);
+        fn.get()(in.data(), out.data());
+        std::println("{}", out);
+    }
+    {
+        std::vector<int32_t> out(4, -1);
+        auto fn = gen_kernel<int32_t, ISA::SSE>(permutation);
+        fn.get()(in.data(), out.data());
+        std::println("{}", out);
+    }
 } catch (const assertion_error& e) {
     std::println("Assertion error: {}", e.what());
     return 1;
