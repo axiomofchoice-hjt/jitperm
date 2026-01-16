@@ -8,11 +8,8 @@ struct assertion_error : std::logic_error {
     using std::logic_error::logic_error;
 };
 
-inline void assert_or_throw(
-    bool condition,
-    const std::source_location& loc = std::source_location::current()) {
+inline void assert_or_throw(bool condition, const std::source_location& loc = std::source_location::current()) {
     if (!condition) [[unlikely]] {
-        throw assertion_error(std::format("Assertion failed at {}:{}",
-                                          loc.file_name(), loc.line()));
+        throw assertion_error(std::format("Assertion failed at {}:{}", loc.file_name(), loc.line()));
     }
 }

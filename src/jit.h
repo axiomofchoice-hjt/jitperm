@@ -19,8 +19,7 @@ struct unique_function {
     unique_function(const unique_function&) = delete;
     unique_function& operator=(const unique_function&) = delete;
 
-    unique_function(unique_function&& other) noexcept
-        : rt_(other.rt_), fn_(other.fn_) {
+    unique_function(unique_function&& other) noexcept : rt_(other.rt_), fn_(other.fn_) {
         other.rt_ = nullptr;
         other.fn_ = nullptr;
     }
