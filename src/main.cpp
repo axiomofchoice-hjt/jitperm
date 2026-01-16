@@ -1,5 +1,6 @@
 #include <asmjit/asmjit.h>
 
+#include <algorithm>
 #include <cstdint>
 #include <print>
 
@@ -7,30 +8,29 @@
 #include "jit.h"
 
 template <typename T>
-using jit_kernel_fn = void (*)(const T* input, T* output);
+using jit_fn = void (*)(const T* input, T* output);
 
-namespace kernel {
-// Emit machine code into the given assembler.
-void emit_reverse_i32x4(asmjit::x86::Assembler& as) {
-    namespace x86 = asmjit::x86;
+jit::unique_function<jit_fn<int32_t>> gen_kernel_stub(
+    std::span<const size_t> permutation) {
+    size_t source_size = *std::ranges::max_element(permutation) + 1;
+    size_t target_size = permutation.size();
+    return jit::gen<jit_fn<int32_t>>([=](asmjit::x86::Assembler& as) {
+        namespace x86 = asmjit::x86;
 
-    // xmm0 = *input
-    as.movdqu(x86::xmm0, x86::ptr(x86::rdi));
+        for (size_t i = 0; i < target_size; ++i) {
+            as.mov(x86::eax,
+                   x86::dword_ptr(x86::rdi, permutation[i] * sizeof(int32_t)));
+            as.mov(x86::dword_ptr(x86::rsi, i * sizeof(int32_t)), x86::eax);
+        }
 
-    // reverse 4 x int32
-    as.pshufd(x86::xmm0, x86::xmm0, 0x1B);
-
-    // store result
-    as.movdqu(x86::ptr(x86::rsi), x86::xmm0);
-
-    as.ret();
+        as.ret();
+    });
 }
-}  // namespace kernel
 
 int main() try {
-    auto fn = jit::gen<jit_kernel_fn<int32_t>>(kernel::emit_reverse_i32x4);
+    auto fn = gen_kernel_stub(std::array<size_t, 4>{3, 0, 1, 2});
 
-    int32_t in[4] = {1, 2, 3, 4};
+    int32_t in[4] = {0, 1, 2, 3};
     int32_t out[4] = {};
 
     fn.get()(in, out);

@@ -11,23 +11,21 @@ inline asmjit::JitRuntime& jit_runtime() {
 }
 
 template <typename Fn>
-struct jit_function {
-    jit_function() = default;
+struct unique_function {
+    unique_function() = default;
 
-    jit_function(asmjit::JitRuntime& rt, Fn fn) : rt_(&rt), fn_(fn) {}
+    unique_function(asmjit::JitRuntime& rt, Fn fn) : rt_(&rt), fn_(fn) {}
 
-    // 不允许拷贝（双重 release 会炸）
-    jit_function(const jit_function&) = delete;
-    jit_function& operator=(const jit_function&) = delete;
+    unique_function(const unique_function&) = delete;
+    unique_function& operator=(const unique_function&) = delete;
 
-    // 允许移动
-    jit_function(jit_function&& other) noexcept
+    unique_function(unique_function&& other) noexcept
         : rt_(other.rt_), fn_(other.fn_) {
         other.rt_ = nullptr;
         other.fn_ = nullptr;
     }
 
-    jit_function& operator=(jit_function&& other) noexcept {
+    unique_function& operator=(unique_function&& other) noexcept {
         if (this != &other) {
             reset();
             rt_ = other.rt_;
@@ -38,7 +36,7 @@ struct jit_function {
         return *this;
     }
 
-    ~jit_function() { reset(); }
+    ~unique_function() { reset(); }
 
     Fn get() const { return fn_; }
     explicit operator bool() const { return fn_ != nullptr; }
@@ -58,7 +56,7 @@ struct jit_function {
 };
 
 template <typename Fn, typename Kernel>
-jit_function<Fn> gen(const Kernel& kernel) {
+unique_function<Fn> gen(const Kernel& kernel) {
     asmjit::CodeHolder code;
     code.init(jit_runtime().environment());
 
@@ -67,6 +65,6 @@ jit_function<Fn> gen(const Kernel& kernel) {
 
     Fn fn = nullptr;
     assert_or_throw(jit_runtime().add(&fn, &code) == asmjit::kErrorOk);
-    return jit_function<Fn>{jit_runtime(), fn};
+    return unique_function<Fn>{jit_runtime(), fn};
 }
 }  // namespace jit
