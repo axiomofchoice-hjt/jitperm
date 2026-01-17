@@ -1,5 +1,5 @@
 #!/bin/sh
 
-xmake project -k compile_commands build
+xmake project -y -k compile_commands build
 xmake
 xmake run
