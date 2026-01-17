@@ -9,3 +9,5 @@ find . -type f \
   -exec echo "===== FILE: {} =====" \; \
   -exec cat {} \; \
   > build/temp
+
+code build/temp
